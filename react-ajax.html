@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="UTF-8">
+		<title></title>
+		<script src="https://unpkg.com/react@16/umd/react.production.min.js"></script>
+		<script src="https://unpkg.com/react-dom@16/umd/react-dom.production.min.js"></script>
+		<script src="https://unpkg.com/babel-standalone@6/babel.min.js"></script>
+		<script src="https://cdn.bootcss.com/jquery/2.1.4/jquery.min.js"></script>
+	</head>
+	<body>
+		<div id="example"></div>
+		<script type="text/babel">
+					var REQUEST_URL = 'https://raw.githubusercontent.com/facebook/react-native/master/docs/MoviesExample.json';
+			
+					class Table extends React.Component{
+						constructor() {
+							super()
+							this.state = {data: null}
+						}
+						componentDidMount() {
+						this.request = $.get(this.props.url, function(res) {
+						//	 console.info(typeof(res))
+								this.setState({
+								data: JSON.parse(res).movies
+								})
+							}.bind(this))
+						}
+						componentWillUnmount() {
+						   this.request.abort()
+						}
+						render() {
+						//	 console.info(this.state)
+						//	 console.info(this.state.data)
+							if(this.state.data){
+								return(
+									<table className="mdl-data-table mdl-js-data-table mdl-data-table--selectable mdl-shadow--2dp" align="left">
+										<thead>
+											<tr>
+												<th>序号</th>
+												<th>名称</th>
+												<th>时长</th>
+												<th>上映时间</th>
+												<th>主演</th>
+											</tr>
+										</thead>
+										<tbody>	
+										{
+										
+												this.state.data.filter(m => m.year > 2000).sort((m, n) => m.year - n.year).map((dt, idx) =>
+												<tr key={idx}>
+												<td>{dt.id}</td>
+												<td>{dt.title}</td>
+												<td>{dt.runtime}</td>
+												<td>{dt.year}</td>
+												<td>{dt.characters}</td>
+												</tr>	
+											)
+										}
+										</tbody>
+									</table>
+								)
+							}else{
+								return(
+								  <p>暂无数据</p>
+								)
+							}
+							
+						}
+					}
+					ReactDOM.render(
+					<Table url={REQUEST_URL} />,
+					document.getElementById('example')
+					)
+			</script>
+	</body>
+</html>
