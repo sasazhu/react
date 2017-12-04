@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="UTF-8">
+		<title></title>
+		<script src="https://unpkg.com/react@16/umd/react.production.min.js"></script>
+		<script src="https://unpkg.com/react-dom@16/umd/react-dom.production.min.js"></script>
+		<script src="https://unpkg.com/babel-standalone@6/babel.min.js"></script>
+		<script src="https://cdn.bootcss.com/jquery/2.1.4/jquery.min.js"></script>
+	</head>
+	<body>
+		<div id="example"></div>
+		<script type="text/babel">
+					var REQUEST_URL = 'https://raw.githubusercontent.com/facebook/react-native/master/docs/MoviesExample.json';
+
+	                class SearchBox extends React.Component{ 
+	                	constructor(){
+	                		super()
+	                		this.state={
+	                			stext:null
+	                		}
+	                	}
+						filter() { 
+							this.setState({
+								stext:this.refs.input.value,
+							}); 
+						}
+						render() { 
+							return ( 
+								<div> 
+									<input id="text" type="text" ref="input" placeholder="Sreaching..." onKeyUp={this.filter.bind(this)} /><br/> 
+								    <Table url={REQUEST_URL} inputtext={this.state.stext}/>
+								</div>
+							); 
+						} 
+					}; 		
+					
+                    
+					class Table extends React.Component{
+						constructor() {
+							super()
+							this.state = {data: null}
+						}
+						componentDidMount() {
+						this.request = $.get(this.props.url, function(res) {
+								this.setState({
+								data: JSON.parse(res).movies
+								})
+							}.bind(this))
+						}
+						componentWillUnmount() {
+						   this.request.abort()
+						}
+						render() {
+							if(this.state.data){
+								return(
+									<table>
+										<thead>
+											<tr>
+												<th>序号</th>
+												<th>名称</th>
+												<th>时长</th>
+												<th>上映时间</th>
+												<th>主演</th>
+											</tr>
+										</thead>
+										<tbody>	
+										{
+											
+											this.props.inputtext?
+											    	this.state.data
+													.filter(m => m.title.indexOf(this.props.inputtext)!==-1).sort((m, n) => m.year - n.year)
+													.map((dt, idx) =>
+													<tr key={idx}>
+													<td>{dt.id}</td>
+													<td>{dt.title}</td>
+													<td>{dt.runtime}</td>
+													<td>{dt.year}</td>
+													<td>{dt.characters}</td>
+													</tr>	
+												):
+										    	this.state.data
+													.sort((m, n) => m.year - n.year)
+													.map((dt, idx) =>
+													<tr key={idx}>
+													<td>{dt.id}</td>
+													<td>{dt.title}</td>
+													<td>{dt.runtime}</td>
+													<td>{dt.year}</td>
+													<td>{dt.characters}</td>
+													</tr>	
+												)
+												
+										}
+										</tbody>
+									</table>
+								)
+							}else{
+								return(
+								  <p>暂无数据</p>
+								)
+							}
+							
+						}
+					}
+					ReactDOM.render(
+				    <SearchBox />,
+					document.getElementById('example')
+					)
+			</script>
+	</body>
+</html>
